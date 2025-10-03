@@ -1,21 +1,75 @@
+import csv
+
 def carica_da_file(file_path):
     """Carica i libri dal file"""
-    # TODO
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        num_sezione = int(file.readline().strip())
+        biblioteca = [[] for _ in range(num_sezione)]
+        max_sezione = 0
+
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row) < 5:
+                continue
+            titolo = row[0].strip()
+            autore = row[1].strip()
+            anno = int(row[2].strip())
+            pagine = int(row[3].strip())
+            sezione = int(row[4].strip())
+
+            if sezione > max_sezione:
+                max_sezione = sezione
+        if max_sezione >= num_sezione:
+            num_sezione = max_sezione + 1
+
+            if 0 <= sezione < num_sezione:
+                biblioteca[sezione].append([titolo, autore, anno, pagine, sezione])
+            else:
+                print(f"Attenzione: sezione {sezione} fuori intervallo per il libro '{titolo}'")
+
+    return biblioteca
 
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
     """Aggiunge un libro nella biblioteca"""
-    # TODO
+    if sezione < 0 or sezione >= len(biblioteca):
+        print("Sezione non valida")
+        return None
+
+    libro = [titolo.strip(), autore.strip(), anno, pagine, sezione]
+
+    if libro not in biblioteca[sezione]:
+        biblioteca[sezione].append(libro)
+        with open(file_path, "a", encoding="utf-8", newline = "") as file:
+            writer = csv.writer(file)
+            writer.writerow(libro)
+        return  True
+    elif libro in biblioteca[sezione]:
+        return False
 
 
 def cerca_libro(biblioteca, titolo):
     """Cerca un libro nella biblioteca dato il titolo"""
-    # TODO
+    risultato = []
+
+    for sezione in biblioteca:
+        for libro in sezione:
+            if libro[0].lower() == titolo.lower():
+                risultato.append(libro)
+
+    return risultato
 
 
 def elenco_libri_sezione_per_titolo(biblioteca, sezione):
     """Ordina i titoli di una data sezione della biblioteca in ordine alfabetico"""
-    # TODO
+
+    if 0 <= sezione < len(biblioteca):
+        titoli = sorted([libro[0] for libro in biblioteca[sezione]])
+        return titoli
+    else:
+        print("Sezione non valida")
+        return None
 
 
 def main():
@@ -97,4 +151,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
